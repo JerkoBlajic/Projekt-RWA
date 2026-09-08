@@ -1,0 +1,29 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ---- Environment ----
+.env
+web/.env
+web/.env.local
+web/.env.*.local
+
+# ---- Node / frontend ----
+node_modules/
+web/dist/
+*.log
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- Docker ----
+pgdata/

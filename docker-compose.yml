@@ -1,0 +1,47 @@
+# =============================================================
+# Docker Compose - local PostgreSQL for development
+# =============================================================
+# Start:   docker compose up -d
+# Stop:    docker compose down
+# Reset:   docker compose down -v      (also deletes the data volume)
+#
+# The backend and frontend run locally (faster hot-reload); only
+# the database lives in Docker so every machine is identical.
+# =============================================================
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rental_db}
+      POSTGRES_USER: ${POSTGRES_USER:-rental_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rental_pass}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # -d <db> so pg_isready connects to the real database instead of the
+      # default (which is named after the user) - avoids a noisy
+      # 'FATAL: database "rental_user" does not exist' line every 5s.
+      test:
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rental_user} -d ${POSTGRES_DB:-rental_db}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Optional lightweight DB browser at http://localhost:8080.
+  # Start it only when you want it:  docker compose --profile tools up -d
+  adminer:
+    image: adminer:4
+    profiles: ["tools"]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
