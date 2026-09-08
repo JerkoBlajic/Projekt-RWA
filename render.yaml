@@ -34,6 +34,12 @@ services:
         value: apartment-rental-management
       - key: CORS_ORIGINS
         sync: false   # set to the static site URL after first deploy
+      # Promote a registered user to ADMIN on startup. Set the username
+      # (and PASSWORD if the user doesn't exist yet), deploy, then clear them.
+      - key: BOOTSTRAP_ADMIN_USERNAME
+        sync: false
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
 
   - type: web
     name: rental-web

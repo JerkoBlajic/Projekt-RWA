@@ -35,6 +35,14 @@ class Settings(BaseSettings):
     # Comma-separated list of allowed frontend origins for CORS.
     CORS_ORIGINS: str = ""
 
+    # Optional bootstrap admin, applied once at startup (see core/bootstrap.py).
+    # Set BOOTSTRAP_ADMIN_USERNAME to promote an already-registered user to ADMIN.
+    # Add BOOTSTRAP_ADMIN_PASSWORD (and optionally _EMAIL) to also create it if
+    # it does not exist yet. Leave blank to disable.
+    BOOTSTRAP_ADMIN_USERNAME: str = ""
+    BOOTSTRAP_ADMIN_EMAIL: str = ""
+    BOOTSTRAP_ADMIN_PASSWORD: str = ""
+
     @field_validator("DATABASE_URL")
     @classmethod
     def _force_async_driver(cls, v: str) -> str:

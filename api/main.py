@@ -6,11 +6,13 @@
 # =============================================================
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.bootstrap import ensure_bootstrap_admin
 from core.config import settings
 from core.errors import (
     AppError,
@@ -33,6 +35,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Runs once on startup (after `alembic upgrade head` in the Docker CMD).
+    await ensure_bootstrap_admin()
+    yield
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Apartment Rental Management API",
@@ -40,6 +49,7 @@ def create_app() -> FastAPI:
         description="Manage apartments, owners, guests and reservations.",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
