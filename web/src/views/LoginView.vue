@@ -54,6 +54,5 @@ async function submit() {
     <p class="muted" style="margin-top: 16px; text-align: center">
       No account? <RouterLink to="/register">Create one</RouterLink>
     </p>
-    <p class="hint" style="text-align:center">Demo: <code>admin / admin123</code> · <code>ana / password123</code></p>
   </div>
 </template>
