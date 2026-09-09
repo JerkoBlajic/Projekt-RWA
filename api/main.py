@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.bootstrap import ensure_bootstrap_admin
+from core.bootstrap import ensure_bootstrap_admin, ensure_default_amenities
 from core.config import settings
 from core.errors import (
     AppError,
@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Runs once on startup (after `alembic upgrade head` in the Docker CMD).
+    await ensure_default_amenities()
     await ensure_bootstrap_admin()
     yield
 

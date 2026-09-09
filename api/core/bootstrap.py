@@ -26,11 +26,38 @@ import logging
 from core.config import settings
 from core.database import AsyncSessionLocal
 from core.security import hash_password
+from models.amenity import Amenity
 from models.enums import Role
 from models.user import User
-from repositories import user_repo
+from repositories import amenity_repo, user_repo
 
 logger = logging.getLogger(__name__)
+
+# Fixed reference data - safe to (re)ensure on every startup.
+DEFAULT_AMENITIES = [
+    "WiFi",
+    "Parking",
+    "Air conditioning",
+    "Pool",
+    "TV",
+    "Kitchen",
+]
+
+
+async def ensure_default_amenities() -> None:
+    """Make sure the standard amenity list exists (idempotent)."""
+    try:
+        async with AsyncSessionLocal() as db:
+            existing = {a.name for a in await amenity_repo.list_all(db)}
+            missing = [n for n in DEFAULT_AMENITIES if n not in existing]
+            if not missing:
+                return
+            for name in missing:
+                db.add(Amenity(name=name))
+            await db.commit()
+            logger.info("Seeded amenities: %s", ", ".join(missing))
+    except Exception:  # never block startup on this
+        logger.exception("Amenity seeding failed; continuing startup.")
 
 
 async def ensure_bootstrap_admin() -> None:
